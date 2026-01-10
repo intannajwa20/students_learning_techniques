@@ -129,3 +129,5 @@ st.markdown("""
 - A positive relationship exists between the frequent use of some techniques and their effectiveness.
 - Study preferences and study time vary, suggesting the need for flexible learning strategies.
 """)
+
+
