@@ -2,87 +2,57 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# --------------------------------------------------
-# Page title & description
-# --------------------------------------------------
-st.title("📙 Member C: Sleep, Obstacles & Support Needs")
-
-st.markdown(
-    """
-    **Objective:**  
-    To explore students’ sleep patterns, learning obstacles, and support needs in order
-    to understand how lifestyle factors and support systems influence learning effectiveness.
-    """
-)
-
-st.divider()
-
-# --------------------------------------------------
-# Load dataset
-# --------------------------------------------------
-@st.cache_data
-def load_data():
-    return pd.read_csv("cleaned_student_study_habits.csv")
-
-df = load_data()
-
-# --------------------------------------------------
-# Ensure numeric columns are numeric (for challenges)
-# --------------------------------------------------
-numeric_cols = [
-    "challenge_health",
-    "challenge_understanding",
-    "challenge_internet_device"
-]
-
-for col in numeric_cols:
-    df[col] = pd.to_numeric(df[col], errors="coerce")
-
-# --------------------------------------------------
-# 1️⃣ Sleep Duration Distribution
-# --------------------------------------------------
-st.subheader("1️⃣ Sleep Duration Distribution")
+st.subheader("1️⃣ Sleep Adequacy Distribution")
 st.caption(
-    "This bar chart shows the distribution of students’ average sleep duration per night."
+    "This bar chart shows students’ perceived adequacy of their sleep on a scale from 1 (Very low) to 5 (Very high)."
 )
 
-sleep_order = [
-    "Less than 4 hours",
-    "4–5 hours",
-    "6–7 hours",
-    "8–9 hours",
-    "More than 9 hours"
-]
+# Ensure numeric
+df["sleep_adequacy_level"] = pd.to_numeric(
+    df["sleep_adequacy_level"], errors="coerce"
+)
 
-sleep_counts = (
-    df["sleep_hours"]
+# Define Likert scale explicitly
+likert_levels = [1, 2, 3, 4, 5]
+
+sleep_adequacy_counts = (
+    df["sleep_adequacy_level"]
     .value_counts()
-    .reindex(sleep_order)
+    .reindex(likert_levels, fill_value=0)
     .reset_index()
 )
 
-sleep_counts.columns = ["Sleep Duration", "Count"]
+sleep_adequacy_counts.columns = [
+    "Sleep Adequacy Level",
+    "Number of Students"
+]
 
-fig_sleep = px.bar(
-    sleep_counts,
-    x="Sleep Duration",
-    y="Count",
-    text="Count",
-    title="Distribution of Students’ Sleep Duration"
+fig_sleep_adequacy = px.bar(
+    sleep_adequacy_counts,
+    x="Sleep Adequacy Level",
+    y="Number of Students",
+    text="Number of Students",
+    title="Distribution of Students’ Sleep Adequacy",
+    category_orders={"Sleep Adequacy Level": likert_levels}
 )
 
-fig_sleep.update_traces(textposition="outside")
+fig_sleep_adequacy.update_traces(textposition="outside")
+fig_sleep_adequacy.update_layout(
+    xaxis_title="Sleep Adequacy Level (1 = Very low, 5 = Very high)",
+    yaxis_title="Number of Students"
+)
 
-st.plotly_chart(fig_sleep, use_container_width=True)
-
+st.plotly_chart(fig_sleep_adequacy, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
-* Most students report sleeping between 6–7 hours per night.
-* A noticeable proportion of students experience insufficient sleep, which may affect concentration and learning effectiveness.
+* Most students rate their sleep adequacy at moderate levels (2–3).
+* Relatively few students report very high sleep adequacy.
+* This suggests that insufficient or inconsistent sleep may be common among students.
 """)
 
 st.markdown("---")
+
 
 # --------------------------------------------------
 # 2️⃣ Learning Obstacles (Health, Understanding, Internet/Device)
