@@ -130,18 +130,23 @@ st.subheader("📚 Programme / Major Distribution")
 programme_counts = (
     filtered_df["programme"]
     .value_counts()
-    .reset_index()
-    .rename(columns={"index": "Programme", "programme": "Count"})
+    .rename_axis("Programme")
+    .reset_index(name="Count")
 )
 
-fig_programme = px.bar(
-    programme_counts,
-    x="Programme",
-    y="Count",
-    title="Respondents by Programme / Major"
-)
+# Safety check (very important)
+if programme_counts.empty:
+    st.warning("No data available for the selected filters.")
+else:
+    fig_programme = px.bar(
+        programme_counts,
+        x="Programme",
+        y="Count",
+        title="Respondents by Programme / Major"
+    )
 
-st.plotly_chart(fig_programme, use_container_width=True)
+    st.plotly_chart(fig_programme, use_container_width=True)
+
 
 # --------------------------------------------------
 # INTERACTIVE DATA PREVIEW
