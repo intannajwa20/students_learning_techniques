@@ -3,15 +3,15 @@ import pandas as pd
 import plotly.express as px
 
 # --------------------------------------------------
-# Page title
+# Page title & description
 # --------------------------------------------------
 st.title("📘 Member A: Study Techniques & Learning Effectiveness")
 
 st.markdown(
     """
     **Objective:**  
-    To analyse the frequency and perceived effectiveness of different study techniques
-    used by students based on survey responses.
+    To analyse the frequency of study techniques used by students and their
+    perceived effectiveness in supporting learning outcomes.
     """
 )
 
@@ -27,7 +27,7 @@ def load_data():
 df = load_data()
 
 # --------------------------------------------------
-# Column groups
+# Column groups (readable labels)
 # --------------------------------------------------
 freq_cols = {
     "Reading Notes / Textbooks": "freq_reading",
@@ -53,7 +53,7 @@ eff_cols = {
 st.subheader("1️⃣ Average Frequency of Study Techniques Used")
 
 freq_means = pd.DataFrame({
-    "Study Technique": freq_cols.keys(),
+    "Study Technique": list(freq_cols.keys()),
     "Average Frequency": [df[col].mean() for col in freq_cols.values()]
 })
 
@@ -62,7 +62,7 @@ fig_freq = px.bar(
     x="Study Technique",
     y="Average Frequency",
     text="Average Frequency",
-    title="Average Frequency of Study Techniques Used",
+    title="Average Frequency of Study Techniques Used"
 )
 
 fig_freq.update_traces(texttemplate="%{text:.2f}", textposition="outside")
@@ -75,7 +75,7 @@ st.plotly_chart(fig_freq, use_container_width=True)
 st.subheader("2️⃣ Average Effectiveness of Study Techniques")
 
 eff_means = pd.DataFrame({
-    "Study Technique": eff_cols.keys(),
+    "Study Technique": list(eff_cols.keys()),
     "Average Effectiveness": [df[col].mean() for col in eff_cols.values()]
 })
 
@@ -84,7 +84,7 @@ fig_eff = px.bar(
     x="Study Technique",
     y="Average Effectiveness",
     text="Average Effectiveness",
-    title="Average Effectiveness of Study Techniques",
+    title="Average Effectiveness of Study Techniques"
 )
 
 fig_eff.update_traces(texttemplate="%{text:.2f}", textposition="outside")
@@ -119,18 +119,13 @@ fig_grouped = px.bar(
 st.plotly_chart(fig_grouped, use_container_width=True)
 
 # --------------------------------------------------
-# 4️⃣ Heatmap: Usage vs Effectiveness
-# --------------------------------------------------
-# --------------------------------------------------
-# 4️⃣ Heatmap: Usage vs Effectiveness (COMMON techniques only)
+# 4️⃣ Heatmap: Usage vs Effectiveness (VALID COMPARISON)
 # --------------------------------------------------
 st.subheader("4️⃣ Heatmap of Study Technique Usage vs Effectiveness")
 
-# Convert to Series with technique names as index
 freq_series = freq_means.set_index("Study Technique")["Average Frequency"]
 eff_series = eff_means.set_index("Study Technique")["Average Effectiveness"]
 
-# Keep only techniques that exist in BOTH
 common_techniques = freq_series.index.intersection(eff_series.index)
 
 heatmap_df = pd.DataFrame({
@@ -147,10 +142,9 @@ fig_heatmap = px.imshow(
 )
 
 st.plotly_chart(fig_heatmap, use_container_width=True)
-True)
 
 # --------------------------------------------------
-# 5️⃣ Box Plot: Effectiveness Distribution
+# 5️⃣ Box Plot: Distribution of Effectiveness Ratings
 # --------------------------------------------------
 st.subheader("5️⃣ Distribution of Effectiveness Ratings")
 
@@ -159,7 +153,7 @@ eff_long = df[list(eff_cols.values())].melt(
     value_name="Effectiveness Score"
 )
 
-# Map column names to readable labels
+# Map internal column names to readable labels
 eff_long["Technique"] = eff_long["Technique"].map(
     {v: k for k, v in eff_cols.items()}
 )
