@@ -16,18 +16,22 @@ to understand how lifestyle factors and support systems influence learning effec
 st.divider()
 
 # --------------------------------------------------
-# Load dataset
+# Load dataset (CRITICAL FIX INCLUDED)
 # --------------------------------------------------
 @st.cache_data
 def load_data():
-    return pd.read_csv("cleaned_student_study_habits.csv")
+    df = pd.read_csv("cleaned_student_study_habits.csv")
+    df.columns = df.columns.str.strip()  # 🔥 FIX: remove hidden spaces
+    return df
 
 df = load_data()
 
 # --------------------------------------------------
-# HARD CLEAN sleep_hours (RULE-BASED)
+# HARD CLEAN sleep_hours (RULE-BASED & SAFE)
 # --------------------------------------------------
 def normalize_sleep(x):
+    if pd.isna(x):
+        return None
     x = str(x).lower().strip()
 
     if "less" in x:
@@ -45,7 +49,6 @@ def normalize_sleep(x):
 
 df["sleep_hours_clean"] = df["sleep_hours"].apply(normalize_sleep)
 
-
 sleep_order = [
     "Less than 4 hours",
     "4-5 hours",
@@ -55,7 +58,7 @@ sleep_order = [
 ]
 
 # --------------------------------------------------
-# Ensure numeric columns are numeric
+# Ensure numeric obstacle columns
 # --------------------------------------------------
 numeric_cols = [
     "challenge_health",
@@ -67,10 +70,9 @@ for col in numeric_cols:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
 # ==================================================
-# 1️⃣ Sleep Duration Distribution
+# 1️⃣ Sleep Duration Distribution  ✅ FIXED
 # ==================================================
 st.subheader("1️⃣ Sleep Duration Distribution")
-st.caption("This bar chart shows the distribution of students’ average sleep duration per night.")
 
 sleep_counts = (
     df["sleep_hours_clean"]
@@ -94,20 +96,12 @@ fig_sleep.update_traces(textposition="outside")
 
 st.plotly_chart(fig_sleep, use_container_width=True)
 
-
-st.markdown("""
-**Key Insights:**
-* Most students sleep between 6–7 hours per night.
-* A notable proportion of students report sleeping less than 5 hours, which may negatively impact learning effectiveness.
-""")
-
 st.markdown("---")
 
 # ==================================================
 # 2️⃣ Learning Obstacles (Average Level)
 # ==================================================
 st.subheader("2️⃣ Learning Obstacles")
-st.caption("This chart compares the average severity of different learning obstacles experienced by students.")
 
 obstacle_cols = {
     "Health Issues": "challenge_health",
@@ -132,19 +126,12 @@ fig_obstacles.update_traces(texttemplate="%{text:.2f}", textposition="outside")
 
 st.plotly_chart(fig_obstacles, use_container_width=True)
 
-st.markdown("""
-**Key Insights:**
-* Difficulty understanding course material is the most significant learning obstacle.
-* Health and internet/device issues also affect a subset of students.
-""")
-
 st.markdown("---")
 
 # ==================================================
 # 3️⃣ Distribution of Learning Obstacle Levels
 # ==================================================
 st.subheader("3️⃣ Distribution of Learning Obstacle Levels")
-st.caption("This box plot shows the variability of students’ ratings for different learning obstacles.")
 
 obstacle_long = df[list(obstacle_cols.values())].melt(
     var_name="Obstacle",
@@ -155,20 +142,14 @@ obstacle_long["Obstacle"] = obstacle_long["Obstacle"].map(
     {v: k for k, v in obstacle_cols.items()}
 )
 
-fig_box_obstacles = px.box(
+fig_box = px.box(
     obstacle_long,
     x="Obstacle",
     y="Level",
     title="Distribution of Learning Obstacle Levels"
 )
 
-st.plotly_chart(fig_box_obstacles, use_container_width=True)
-
-st.markdown("""
-**Key Insights:**
-* Some obstacles show wide variability, indicating different impacts across students.
-* Learning challenges are not experienced uniformly and may require targeted support.
-""")
+st.plotly_chart(fig_box, use_container_width=True)
 
 st.markdown("---")
 
@@ -176,13 +157,14 @@ st.markdown("---")
 # 4️⃣ Support Needs Distribution
 # ==================================================
 st.subheader("4️⃣ Support Needs Distribution")
-st.caption("This chart shows the most frequently requested academic and personal support services.")
 
 support_series = (
     df["support_needs"]
     .dropna()
-    .str.split(", ")
+    .astype(str)
+    .str.split(",")
     .explode()
+    .str.strip()
 )
 
 support_counts = support_series.value_counts().reset_index()
@@ -200,17 +182,13 @@ fig_support.update_traces(textposition="outside")
 
 st.plotly_chart(fig_support, use_container_width=True)
 
-st.markdown("""
-**Key Insights:**
-* Time management guidance and mental health support are among the most requested needs.
-* Academic support such as study materials and lecturer consultation remains highly important.
-""")
-
 st.markdown("---")
 
 # ==================================================
-# 5️⃣ Sleep Duration vs Learning Obstacles
+# 5️⃣ Sleep Duration vs Learning Obstacles ✅ FIXED
 # ==================================================
+st.subheader("5️⃣ Sleep Duration vs Learning Obstacles")
+
 sleep_obstacle_df = (
     df.groupby("sleep_hours_clean")[list(obstacle_cols.values())]
     .mean()
@@ -240,13 +218,6 @@ fig_sleep_obstacle = px.bar(
 
 st.plotly_chart(fig_sleep_obstacle, use_container_width=True)
 
-
-st.markdown("""
-**Key Insights:**
-* Students with shorter sleep durations generally report higher learning obstacle levels.
-* Adequate sleep appears to be associated with fewer learning difficulties.
-""")
-
 st.markdown("---")
 
 # ==================================================
@@ -255,9 +226,9 @@ st.markdown("---")
 st.subheader("Conclusion (Member C)")
 
 st.markdown("""
-Overall, the analysis indicates that sleep duration plays a critical role in students’ learning experiences.
-Insufficient sleep is associated with higher learning obstacles, particularly difficulty understanding course material.
-In addition, students express strong demand for both academic and well-being support services.
-These findings highlight the importance of promoting healthy sleep habits and comprehensive support systems
-to enhance learning effectiveness.
+Sleep duration plays a critical role in students’ learning experiences.
+Students with insufficient sleep tend to report higher learning obstacles,
+particularly in understanding course material.
+Additionally, strong demand for academic and well-being support highlights
+the need for holistic student support systems.
 """)
