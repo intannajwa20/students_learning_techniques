@@ -210,7 +210,6 @@ eff_long = df[list(eff_cols.values())].melt(
     value_name="Effectiveness Score"
 )
 
-# Map internal column names to readable labels
 eff_long["Technique"] = eff_long["Technique"].map(
     {v: k for k, v in eff_cols.items()}
 )
@@ -225,7 +224,8 @@ fig_box = px.box(
 st.plotly_chart(fig_box, use_container_width=True)
 
 st.caption(
-    "This box plot shows the distribution of perceived effectiveness ratings across different study techniques, highlighting variability, median values, and potential differences in students’ learning preferences.""
+    "This box plot shows the distribution of perceived effectiveness ratings across different study techniques, "
+    "highlighting variability, median values, and potential differences in students’ learning preferences."
 )
 
 st.markdown("""
@@ -237,7 +237,6 @@ st.markdown("""
 * This reinforces the idea that no single study method works equally well for everyone.
 """)
 
-st.markdown("---")
 
 # ==================================================
 # Conclusion
