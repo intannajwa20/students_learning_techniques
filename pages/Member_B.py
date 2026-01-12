@@ -174,43 +174,46 @@ st.markdown("""
 st.markdown("---")
 
 # --------------------------------------------------
-# 5️⃣ Goal-Setting Frequency
+# 5️⃣ Correlation Heatmap: Distraction, Challenges & Motivation
 # --------------------------------------------------
-st.subheader("5️⃣ Study Goal-Setting Frequency")
+st.subheader("5️⃣ Correlation Heatmap: Distraction, Challenges & Motivation")
 st.caption(
-    "This chart shows how frequently students set specific goals for their study sessions."
+    "This heatmap shows the correlation between different academic challenges, "
+    "distraction control, and student motivation levels."
 )
 
-likert_order = ["Never", "Rarely", "Sometimes", "Often", "Always"]
+corr_cols = [
+    "challenge_lack_of_time",
+    "challenge_assignments",
+    "challenge_distractions",
+    "challenge_environment",
+    "challenge_lack_of_motivation",
+    "limit_distractions",
+    "motivation_level"
+]
 
-goal_counts = (
-    df["set_study_goals"]
-    .value_counts()
-    .reindex(likert_order)
-    .reset_index()
+# Compute correlation matrix
+corr_matrix = df[corr_cols].corr().round(2)
+
+fig_corr = px.imshow(
+    corr_matrix,
+    text_auto=True,
+    color_continuous_scale="Reds",
+    aspect="auto",
+    title="Correlation Heatmap: Distraction, Challenges & Motivation"
 )
 
-goal_counts.columns = ["Goal-Setting Frequency", "Count"]
-
-fig_goals = px.bar(
-    goal_counts,
-    x="Goal-Setting Frequency",
-    y="Count",
-    text="Count",
-    title="Frequency of Study Goal-Setting"
-)
-
-fig_goals.update_traces(textposition="outside")
-
-st.plotly_chart(fig_goals, use_container_width=True)
+st.plotly_chart(fig_corr, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
-* Many students do not consistently set study goals.
-* Regular goal-setting may help improve motivation and reduce stress during study sessions.
+* Academic challenges such as lack of time, assignments, and distractions are strongly correlated with one another.
+* Motivation level shows a negative relationship with lack of motivation and weak relationships with most stress factors.
+* This suggests that while academic stressors are interconnected, motivation is influenced by additional personal factors.
 """)
 
 st.markdown("---")
+
 
 
 # ==================================================
