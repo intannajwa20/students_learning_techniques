@@ -57,26 +57,30 @@ for col in obstacle_cols.values():
     if df[col].notna().any():
         df[col] = df[col].fillna(df[col].mode()[0])
 
-# ==================================================
-# 1️⃣ (STATIC) Distribution of Sleep Adequacy (Colab style)
-# ==================================================
-st.subheader("1️⃣ Distribution of Sleep Adequacy")
-st.caption("Same as Colab: counts of sleep adequacy levels (1 = very low, 5 = very high).")
+st.subheader("1️⃣ Distribution of Sleep Adequacy (Interactive)")
+st.caption("Interactive bar chart showing students’ sleep adequacy levels (1 = very low, 5 = very high).")
 
 sleep_counts = (
     df["sleep_adequacy_level"]
     .value_counts()
     .sort_index()
-    .reindex(sleep_levels, fill_value=0)
+    .reset_index()
 )
 
-fig1, ax1 = plt.subplots(figsize=(6, 4))
-ax1.bar(sleep_counts.index.astype(int), sleep_counts.values)
-ax1.set_title("Distribution of Students' Sleep Adequacy")
-ax1.set_xlabel("Sleep Adequacy Level (1 = Very low, 5 = Very high)")
-ax1.set_ylabel("Number of Students")
-ax1.set_xticks(sleep_levels)
-st.pyplot(fig1)
+sleep_counts.columns = ["Sleep Adequacy Level", "Count"]
+
+fig_sleep_interactive = px.bar(
+    sleep_counts,
+    x="Sleep Adequacy Level",
+    y="Count",
+    text="Count",
+    title="Distribution of Students’ Sleep Adequacy",
+)
+
+fig_sleep_interactive.update_traces(textposition="outside")
+
+st.plotly_chart(fig_sleep_interactive, use_container_width=True)
+
 
 st.markdown("""
 **Key Insights:**
@@ -179,8 +183,8 @@ st.markdown("---")
 # ==================================================
 # 5️⃣ (STATIC) Stacked Bar: Support Needs Across Sleep Adequacy (Colab style)
 # ==================================================
-st.subheader("5️⃣ Support Needs Across Sleep Adequacy Levels")
-st.caption("Same as Colab: stacked bar of support types by sleep adequacy level.")
+st.subheader("5️⃣ Support Needs Across Sleep Adequacy Levels (Interactive)")
+st.caption("Interactive stacked bar chart showing support needs by sleep adequacy level.")
 
 support_sleep = (
     df[["sleep_adequacy_level", "support_needs"]]
@@ -188,21 +192,30 @@ support_sleep = (
     .assign(support=lambda d: d["support_needs"].astype(str).str.split(","))
     .explode("support")
 )
-support_sleep["support"] = support_sleep["support"].astype(str).str.strip()
 
-pivot_support = pd.crosstab(
-    support_sleep["sleep_adequacy_level"],
-    support_sleep["support"]
-).reindex(sleep_levels, fill_value=0)
+support_sleep["support"] = support_sleep["support"].str.strip()
 
-fig5, ax5 = plt.subplots(figsize=(12, 6))
-pivot_support.plot(kind="bar", stacked=True, ax=ax5)
-ax5.set_title("Support Needs Across Sleep Adequacy Levels")
-ax5.set_xlabel("Sleep Adequacy Level (1 = very low, 5 = very high)")
-ax5.set_ylabel("Number of Students")
-ax5.legend(bbox_to_anchor=(1.02, 1), loc="upper left")
-plt.tight_layout()
-st.pyplot(fig5)
+pivot_support = (
+    support_sleep
+    .groupby(["sleep_adequacy_level", "support"])
+    .size()
+    .reset_index(name="Count")
+)
+
+fig_support_sleep = px.bar(
+    pivot_support,
+    x="sleep_adequacy_level",
+    y="Count",
+    color="support",
+    barmode="stack",
+    title="Support Needs Across Sleep Adequacy Levels",
+    labels={
+        "sleep_adequacy_level": "Sleep Adequacy Level (1 = very low, 5 = very high)",
+        "support": "Support Type"
+    }
+)
+
+st.plotly_chart(fig_support_sleep, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
