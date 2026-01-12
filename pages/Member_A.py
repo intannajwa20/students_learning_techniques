@@ -121,12 +121,22 @@ st.plotly_chart(fig_grouped, use_container_width=True)
 # --------------------------------------------------
 # 4️⃣ Heatmap: Usage vs Effectiveness
 # --------------------------------------------------
+# --------------------------------------------------
+# 4️⃣ Heatmap: Usage vs Effectiveness (COMMON techniques only)
+# --------------------------------------------------
 st.subheader("4️⃣ Heatmap of Study Technique Usage vs Effectiveness")
 
+# Convert to Series with technique names as index
+freq_series = freq_means.set_index("Study Technique")["Average Frequency"]
+eff_series = eff_means.set_index("Study Technique")["Average Effectiveness"]
+
+# Keep only techniques that exist in BOTH
+common_techniques = freq_series.index.intersection(eff_series.index)
+
 heatmap_df = pd.DataFrame({
-    "Usage": freq_means["Average Frequency"].values,
-    "Effectiveness": eff_means["Average Effectiveness"].values
-}, index=freq_means["Study Technique"])
+    "Usage": freq_series.loc[common_techniques],
+    "Effectiveness": eff_series.loc[common_techniques]
+})
 
 fig_heatmap = px.imshow(
     heatmap_df,
@@ -137,6 +147,7 @@ fig_heatmap = px.imshow(
 )
 
 st.plotly_chart(fig_heatmap, use_container_width=True)
+True)
 
 # --------------------------------------------------
 # 5️⃣ Box Plot: Effectiveness Distribution
