@@ -69,6 +69,21 @@ fig_freq.update_traces(texttemplate="%{text:.2f}", textposition="outside")
 
 st.plotly_chart(fig_freq, use_container_width=True)
 
+st.caption(
+    "This bar chart shows how often students use different study techniques on average, based on a scale from 1 to 5."
+)
+
+st.markdown("""
+**Key Insights:**
+* Students most frequently rely on traditional methods, such as reading notes/textbooks and watching online videos.
+
+* Active learning strategies like practice tests and teaching others are used less frequently, despite their potential benefits.
+
+* This suggests that many students may prefer passive study techniques over more engaging or cognitively demanding approaches.
+""")
+
+st.markdown("---")
+
 # --------------------------------------------------
 # 2️⃣ Average Effectiveness of Study Techniques
 # --------------------------------------------------
