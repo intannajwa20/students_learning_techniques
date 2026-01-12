@@ -25,14 +25,26 @@ def load_data():
 df = load_data()
 
 # --------------------------------------------------
-# 🔧 CRITICAL FIX: Standardize sleep_hours categories
+# HARD CLEAN sleep_hours (RULE-BASED)
 # --------------------------------------------------
-df["sleep_hours"] = (
-    df["sleep_hours"]
-    .astype(str)
-    .str.strip()
-    .str.replace("–", "-", regex=False)  # normalize dash
-)
+def normalize_sleep(x):
+    x = str(x).lower().strip()
+
+    if "less" in x:
+        return "Less than 4 hours"
+    elif "4" in x and "5" in x:
+        return "4-5 hours"
+    elif "6" in x and "7" in x:
+        return "6-7 hours"
+    elif "8" in x and "9" in x:
+        return "8-9 hours"
+    elif "more" in x:
+        return "More than 9 hours"
+    else:
+        return None
+
+df["sleep_hours_clean"] = df["sleep_hours"].apply(normalize_sleep)
+
 
 sleep_order = [
     "Less than 4 hours",
@@ -61,7 +73,7 @@ st.subheader("1️⃣ Sleep Duration Distribution")
 st.caption("This bar chart shows the distribution of students’ average sleep duration per night.")
 
 sleep_counts = (
-    df["sleep_hours"]
+    df["sleep_hours_clean"]
     .value_counts()
     .reindex(sleep_order, fill_value=0)
     .reset_index()
@@ -81,6 +93,7 @@ fig_sleep = px.bar(
 fig_sleep.update_traces(textposition="outside")
 
 st.plotly_chart(fig_sleep, use_container_width=True)
+
 
 st.markdown("""
 **Key Insights:**
@@ -198,18 +211,15 @@ st.markdown("---")
 # ==================================================
 # 5️⃣ Sleep Duration vs Learning Obstacles
 # ==================================================
-st.subheader("5️⃣ Sleep Duration vs Learning Obstacles")
-st.caption("This grouped bar chart compares learning obstacle levels across different sleep duration groups.")
-
 sleep_obstacle_df = (
-    df.groupby("sleep_hours")[list(obstacle_cols.values())]
+    df.groupby("sleep_hours_clean")[list(obstacle_cols.values())]
     .mean()
     .reindex(sleep_order)
     .reset_index()
 )
 
 sleep_obstacle_long = sleep_obstacle_df.melt(
-    id_vars="sleep_hours",
+    id_vars="sleep_hours_clean",
     var_name="Obstacle",
     value_name="Average Level"
 )
@@ -220,15 +230,16 @@ sleep_obstacle_long["Obstacle"] = sleep_obstacle_long["Obstacle"].map(
 
 fig_sleep_obstacle = px.bar(
     sleep_obstacle_long,
-    x="sleep_hours",
+    x="sleep_hours_clean",
     y="Average Level",
     color="Obstacle",
     barmode="group",
     title="Learning Obstacles by Sleep Duration",
-    category_orders={"sleep_hours": sleep_order}
+    category_orders={"sleep_hours_clean": sleep_order}
 )
 
 st.plotly_chart(fig_sleep_obstacle, use_container_width=True)
+
 
 st.markdown("""
 **Key Insights:**
