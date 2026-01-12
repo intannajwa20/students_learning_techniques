@@ -106,6 +106,20 @@ fig_eff.update_traces(texttemplate="%{text:.2f}", textposition="outside")
 
 st.plotly_chart(fig_eff, use_container_width=True)
 
+st.caption(
+    "This bar chart shows how effective students believe each study technique is, based on a rating scale from 1 to 5."
+)
+
+st.markdown("""
+**Key Insights:**
+* Practice tests/quizzes and group study are perceived as among the most effective study techniques.
+
+* Passive methods, although commonly used, do not always correspond to the highest perceived effectiveness.
+
+* This highlights a potential mismatch between student habits and effective learning strategies.
+""")
+
+st.markdown("---")
 # --------------------------------------------------
 # 3️⃣ Grouped Bar Chart: Frequency vs Effectiveness
 # --------------------------------------------------
@@ -133,6 +147,20 @@ fig_grouped = px.bar(
 
 st.plotly_chart(fig_grouped, use_container_width=True)
 
+st.caption(
+    "This grouped bar chart shows the comparison between how frequently study techniques are used and how effective they are perceived to be."
+)
+
+st.markdown("""
+**Key Insights:**
+* Several study techniques show higher effectiveness scores than usage scores, indicating they may be underutilized.
+
+* Techniques such as practice tests demonstrate a notable gap between effectiveness and actual usage.
+
+* Encouraging students to adopt these underused yet effective strategies could improve learning outcomes.
+""")
+
+st.markdown("---")
 # --------------------------------------------------
 # 4️⃣ Heatmap: Usage vs Effectiveness (VALID COMPARISON)
 # --------------------------------------------------
@@ -158,6 +186,20 @@ fig_heatmap = px.imshow(
 
 st.plotly_chart(fig_heatmap, use_container_width=True)
 
+st.caption(
+    "This heatmap visualizes the relationship between the average frequency of use and the perceived effectiveness of study techniques that have both measurements available."
+)
+
+st.markdown("""
+**Key Insights:**
+* Techniques with both high usage and high effectiveness represent well-aligned study habits.
+
+* Techniques with lower usage but high effectiveness may represent opportunities for learning improvement if adopted more widely.
+
+* The heatmap visually highlights where students’ study behaviors are well aligned or misaligned with perceived effectiveness.
+""")
+
+st.markdown("---")
 # --------------------------------------------------
 # 5️⃣ Box Plot: Distribution of Effectiveness Ratings
 # --------------------------------------------------
@@ -181,3 +223,27 @@ fig_box = px.box(
 )
 
 st.plotly_chart(fig_box, use_container_width=True)
+
+st.caption(
+    "This box plot shows the distribution of perceived effectiveness ratings across different study techniques, highlighting variability, median values, and potential differences in students’ learning preferences.""
+)
+
+st.markdown("""
+**Key Insights:**
+* Some techniques show greater variability in effectiveness ratings, suggesting differences in individual learning preferences.
+
+* Techniques with narrower distributions indicate more consistent perceived effectiveness across students.
+
+* This reinforces the idea that no single study method works equally well for everyone.
+""")
+
+st.markdown("---")
+
+# ==================================================
+# Conclusion
+# ==================================================
+st.subheader("Conclusion (Member A)")
+
+st.markdown("""
+Students most frequently use traditional study methods such as reading notes and watching online videos. However, active learning strategies like practice tests and group study are perceived as more effective, despite being used less often. This indicates a gap between students’ study habits and the techniques they find most beneficial, suggesting that greater adoption of active learning approaches could improve learning outcomes.
+""")
