@@ -75,6 +75,7 @@ fig_sleep.update_traces(textposition="outside")
 
 st.plotly_chart(fig_sleep, use_container_width=True)
 
+
 st.markdown("""
 **Key Insights:**
 * Most students report sleeping between 6–7 hours per night.
