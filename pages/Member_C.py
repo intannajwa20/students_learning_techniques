@@ -25,6 +25,24 @@ def load_data():
 df = load_data()
 
 # --------------------------------------------------
+# 🔧 CRITICAL FIX: Standardize sleep_hours categories
+# --------------------------------------------------
+df["sleep_hours"] = (
+    df["sleep_hours"]
+    .astype(str)
+    .str.strip()
+    .str.replace("–", "-", regex=False)  # normalize dash
+)
+
+sleep_order = [
+    "Less than 4 hours",
+    "4-5 hours",
+    "6-7 hours",
+    "8-9 hours",
+    "More than 9 hours"
+]
+
+# --------------------------------------------------
 # Ensure numeric columns are numeric
 # --------------------------------------------------
 numeric_cols = [
@@ -41,14 +59,6 @@ for col in numeric_cols:
 # ==================================================
 st.subheader("1️⃣ Sleep Duration Distribution")
 st.caption("This bar chart shows the distribution of students’ average sleep duration per night.")
-
-sleep_order = [
-    "Less than 4 hours",
-    "4–5 hours",
-    "6–7 hours",
-    "8–9 hours",
-    "More than 9 hours"
-]
 
 sleep_counts = (
     df["sleep_hours"]
@@ -75,7 +85,7 @@ st.plotly_chart(fig_sleep, use_container_width=True)
 st.markdown("""
 **Key Insights:**
 * Most students sleep between 6–7 hours per night.
-* A notable proportion report sleeping less than 5 hours, which may negatively affect focus and learning performance.
+* A notable proportion of students report sleeping less than 5 hours, which may negatively impact learning effectiveness.
 """)
 
 st.markdown("---")
@@ -111,8 +121,8 @@ st.plotly_chart(fig_obstacles, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
-* Difficulty understanding course material is the most prominent learning obstacle.
-* Health-related and internet/device issues also affect a subset of students.
+* Difficulty understanding course material is the most significant learning obstacle.
+* Health and internet/device issues also affect a subset of students.
 """)
 
 st.markdown("---")
@@ -143,8 +153,8 @@ st.plotly_chart(fig_box_obstacles, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
-* Some obstacles show wide variability, indicating different levels of impact across students.
-* This suggests the need for targeted rather than one-size-fits-all interventions.
+* Some obstacles show wide variability, indicating different impacts across students.
+* Learning challenges are not experienced uniformly and may require targeted support.
 """)
 
 st.markdown("---")
@@ -179,7 +189,7 @@ st.plotly_chart(fig_support, use_container_width=True)
 
 st.markdown("""
 **Key Insights:**
-* Time management guidance and mental health support are among the most requested services.
+* Time management guidance and mental health support are among the most requested needs.
 * Academic support such as study materials and lecturer consultation remains highly important.
 """)
 
@@ -234,9 +244,9 @@ st.markdown("---")
 st.subheader("Conclusion (Member C)")
 
 st.markdown("""
-Overall, the analysis shows that sleep duration is closely related to students’ learning experiences.
-Insufficient sleep is associated with higher learning obstacles, particularly in understanding course material.
-Additionally, students express strong demand for both academic and well-being support.
+Overall, the analysis indicates that sleep duration plays a critical role in students’ learning experiences.
+Insufficient sleep is associated with higher learning obstacles, particularly difficulty understanding course material.
+In addition, students express strong demand for both academic and well-being support services.
 These findings highlight the importance of promoting healthy sleep habits and comprehensive support systems
 to enhance learning effectiveness.
 """)
