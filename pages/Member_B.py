@@ -181,7 +181,15 @@ st.caption(
     "This chart shows how frequently students set specific goals for their study sessions."
 )
 
-goal_counts = df["set_study_goals"].value_counts().sort_index().reset_index()
+likert_order = ["Never", "Rarely", "Sometimes", "Often", "Always"]
+
+goal_counts = (
+    df["set_study_goals"]
+    .value_counts()
+    .reindex(likert_order)
+    .reset_index()
+)
+
 goal_counts.columns = ["Goal-Setting Frequency", "Count"]
 
 fig_goals = px.bar(
@@ -203,6 +211,7 @@ st.markdown("""
 """)
 
 st.markdown("---")
+
 
 # ==================================================
 # Conclusion
